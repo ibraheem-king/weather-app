@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Free Weather App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial; 
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { margin: 30px 0; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .search-box { margin: 20px 0; }
+        input { 
+            padding: 15px; 
+            width: 70%; 
+            border: none;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+        button { 
+            padding: 15px 20px; 
+            background: #FF9800; 
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .weather-card {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .temp { font-size: 4rem; font-weight: bold; margin: 20px 0; }
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .detail-item {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        .ad-space {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        .ad-box {
+            width: 100%;
+            height: 100px;
+            background: rgba(255,255,255,0.2);
+            border: 2px dashed white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px auto;
+            border-radius: 5px;
+        }
+        .forecast {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .forecast-day {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 5px;
+            min-width: 120px;
+        }
+        @media (max-width: 600px) {
+            .details { grid-template-columns: 1fr; }
+            .forecast { flex-direction: column; }
+            input { width: 60%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌤️ Free Weather</h1>
+            <p>Accurate weather forecasts for any location</p>
+        </div>
+
+        <!-- Ad Space 1 -->
+        <div class="ad-space">
+            <p>Advertisement</p>
+            <div class="ad-box">
+                Ad will appear here
+            </div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="city-input" placeholder="Enter city name..." value="New York">
+            <button id="search-btn">Search</button>
+        </div>
+
+        <div class="weather-card">
+            <h2 id="city-name">New York, USA</h2>
+            <p id="date-time">Loading...</p>
+            <div class="temp" id="temperature">24°C</div>
+            <p id="weather-desc">Sunny</p>
+            
+            <div class="details">
+                <div class="detail-item">💨 Wind: <span id="wind">12 km/h</span></div>
+                <div class="detail-item">💧 Humidity: <span id="humidity">65%</span></div>
+                <div class="detail-item">🔥 Feels: <span id="feels-like">26°C</span></div>
+                <div class="detail-item">☀️ UV: <span id="uv">5 Medium</span></div>
+            </div>
+        </div>
+
+        <!-- Ad Space 2 -->
+        <div class="ad-space">
+            <div class="ad-box">
+                Ad will appear here
+            </div>
+        </div>
+
+        <h3>3-Day Forecast</h3>
+        <div class="forecast" id="forecast">
+            <!-- Forecast will be added by JavaScript -->
+        </div>
+
+        <!-- Ad Space 3 -->
+        <div class="ad-space">
+            <div class="ad-box">
+                Ad will appear here
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; font-size: 0.9rem; opacity: 0.8;">
+            <p>© 2023 Free Weather App | Made with ❤️</p>
+            <p>Weather data from OpenWeatherMap</p>
+            <p>Ads support this free service</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple weather data
+        function getWeatherData(city) {
+            const cities = {
+                "New York": { temp: "24", desc: "Sunny", wind: "12 km/h", humidity: "65%", feels: "26°C", uv: "5 Medium" },
+                "London": { temp: "18", desc: "Cloudy", wind: "8 km/h", humidity: "70%", feels: "17°C", uv: "3 Low" },
+                "Tokyo": { temp: "22", desc: "Partly Cloudy", wind: "10 km/h", humidity: "60%", feels: "23°C", uv: "6 High" },
+                "Delhi": { temp: "30", desc: "Haze", wind: "5 km/h", humidity: "45%", feels: "32°C", uv: "8 Very High" },
+                "Paris": { temp: "20", desc: "Clear", wind: "7 km/h", humidity: "68%", feels: "19°C", uv: "4 Medium" }
+            };
+            
+            return cities[city] || { 
+                temp: "22", desc: "Clear", wind: "10 km/h", 
+                humidity: "60%", feels: "23°C", uv: "5 Medium" 
+            };
+        }
+
+        function updateWeather() {
+            const city = document.getElementById('city-input').value || "New York";
+            const data = getWeatherData(city);
+            
+            document.getElementById('city-name').textContent = city + ", USA";
+            document.getElementById('temperature').textContent = data.temp + "°C";
+            document.getElementById('weather-desc').textContent = data.desc;
+            document.getElementById('wind').textContent = data.wind;
+            document.getElementById('humidity').textContent = data.humidity;
+            document.getElementById('feels-like').textContent = data.feels;
+            document.getElementById('uv').textContent = data.uv;
+            
+            // Generate forecast
+            const forecastDiv = document.getElementById('forecast');
+            forecastDiv.innerHTML = "";
+            const days = ["Tomorrow", "Day 2", "Day 3"];
+            const icons = ["☀️", "⛅", "🌧️"];
+            const temps = ["26°C/18°C", "22°C/16°C", "19°C/14°C"];
+            
+            days.forEach((day, index) => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'forecast-day';
+                dayDiv.innerHTML = `
+                    <h4>${day}</h4>
+                    <div style="font-size: 2rem">${icons[index]}</div>
+                    <div style="font-weight: bold">${temps[index]}</div>
+                `;
+                forecastDiv.appendChild(dayDiv);
+            });
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('date-time').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Setup events
+        document.getElementById('search-btn').addEventListener('click', updateWeather);
+        document.getElementById('city-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') updateWeather();
+        });
+
+        // Initialize
+        updateDateTime();
+        updateWeather();
+        setInterval(updateDateTime, 60000);
+    </script>
+</body>
+</html>
